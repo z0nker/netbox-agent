@@ -344,10 +344,10 @@ class Network(object):
                     )
                 return netbox_ip
             else:
-                if netbox_ip.interface is None:
+                if netbox_ip.assigned_object is None:
                     logging.info('Assigning existing IP {ip} to {interface}'.format(
                         ip=ip, interface=interface))
-                elif netbox_ip.interface.id != interface.id:
+                elif netbox_ip.assigned_object_id != interface.id:
                     logging.info(
                         'Detected interface change for ip {ip}: old interface is '
                         '{old_interface} (id: {old_id}), new interface is {new_interface} '
@@ -358,7 +358,7 @@ class Network(object):
                         ))
                 else:
                     return netbox_ip
-                netbox_ip.interface = interface
+                netbox_ip.assigned_object = interface
                 netbox_ip.save()
         return netbox_ip
 
