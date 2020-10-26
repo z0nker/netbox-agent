@@ -13,8 +13,9 @@ The goal is to generate an existing infrastructure on Netbox and have the abilit
 * Generic ability to guess datacenters and rack location through drivers (`cmd` and `file` and custom ones)
 * Update existing `Device` and `Interface`
 * Handle blade moving (new slot, new chassis)
+* Handle blade GPU expansions
 * Automatic cabling (server's interface to switch's interface) using lldp
-* Local inventory using `Inventory Item` for CPU, RAM, RAID cards, physical disks (behind raid cards)
+* Local inventory using `Inventory Item` for CPU, GPU, RAM, RAID cards, physical disks (behind raid cards)
 * PSUs creation and power consumption reporting (based on vendor's tools)
 
 # Requirements
@@ -202,6 +203,7 @@ Tested on:
 * HP ProLiant BL460c Gen8
 * HP ProLiant BL460c Gen9
 * HP ProLiant BL460c Gen10
+* HP ProLiant BL460c Gen10 Graphics Exp its expansion HP ProLiant BL460c Graphics Expansion Blade
 * HP Moonshot 1500 Enclosure (your `DeviceType` should have slots batch create with `Bay c[1-45n1]`) with HP ProLiant m750, m710x, m510 Server Cartridge
 
 ### Pizzas

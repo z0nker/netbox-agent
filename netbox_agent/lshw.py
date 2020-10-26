@@ -22,6 +22,7 @@ class LSHW():
         self.cpus = []
         self.power = []
         self.disks = []
+        self.gpus = []
         self.vendor = self.hw_info["vendor"]
         self.product = self.hw_info["product"]
         self.chassis_serial = self.hw_info["serial"]
@@ -53,6 +54,8 @@ class LSHW():
     def get_hw_linux(self, hwclass):
         if hwclass == "cpu":
             return self.cpus
+        if hwclass == "gpu":
+            return self.gpus
         if hwclass == "network":
             return self.interfaces
         if hwclass == 'storage':
@@ -85,22 +88,28 @@ class LSHW():
                 self.disks.append(d)
 
         elif "nvme" in obj["configuration"]["driver"]:
-            nvme = json.loads(
-                subprocess.check_output(
-                    ["nvme", '-list', '-o', 'json'],
-                    encoding='utf8')
-            )
+            if not is_tool('nvme'):
+                logging.error('nvme-cli >= 1.0 does not seem to be installed')
+            else:
+                try:
+                    nvme = json.loads(
+                        subprocess.check_output(
+                            ["nvme", '-list', '-o', 'json'],
+                            encoding='utf8')
+                    )
 
-            for device in nvme["Devices"]:
-                d = {}
-                d['logicalname'] = device["DevicePath"]
-                d['product'] = device["ModelNumber"]
-                d['serial'] = device["SerialNumber"]
-                d["version"] = device["Firmware"]
-                d['size'] = device["UsedSize"]
-                d['description'] = "NVME Disk"
+                    for device in nvme["Devices"]:
+                        d = {}
+                        d['logicalname'] = device["DevicePath"]
+                        d['product'] = device["ModelNumber"]
+                        d['serial'] = device["SerialNumber"]
+                        d["version"] = device["Firmware"]
+                        d['size'] = device["UsedSize"]
+                        d['description'] = "NVME Disk"
 
-                self.disks.append(d)
+                        self.disks.append(d)
+                except Exception:
+                    pass
 
     def find_cpus(self, obj):
         if "product" in obj:
@@ -132,6 +141,15 @@ class LSHW():
 
             self.memories.append(d)
 
+    def find_gpus(self, obj):
+        if "product" in obj:
+            c = {}
+            c["product"] = obj["product"]
+            c["vendor"] = obj["vendor"]
+            c["description"] = obj["description"]
+
+            self.gpus.append(c)
+
     def walk_bridge(self, obj):
         if "children" not in obj:
             return
@@ -139,6 +157,8 @@ class LSHW():
         for bus in obj["children"]:
             if bus["class"] == "storage":
                 self.find_storage(bus)
+            if bus["class"] == "display":
+                self.find_gpus(bus)
 
             if "children" in bus:
                 for b in bus["children"]:
@@ -146,6 +166,8 @@ class LSHW():
                         self.find_storage(b)
                     if b["class"] == "network":
                         self.find_network(b)
+                    if b["class"] == "display":
+                        self.find_gpus(b)
 
 
 if __name__ == "__main__":
