@@ -344,7 +344,7 @@ class Network(object):
                     )
                 return netbox_ip
             else:
-                if netbox_ip.assigned_object is None:
+                if netbox_ip.assigned_object_id is None:
                     logging.info('Assigning existing IP {ip} to {interface}'.format(
                         ip=ip, interface=interface))
                 elif netbox_ip.assigned_object_id != interface.id:
@@ -358,6 +358,8 @@ class Network(object):
                         ))
                 else:
                     return netbox_ip
+                netbox_ip.assigned_object_type = 'dcim.interface'
+                netbox_ip.assigned_object_id = interface.id
                 netbox_ip.assigned_object = interface
                 netbox_ip.save()
         return netbox_ip
