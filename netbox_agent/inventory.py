@@ -449,7 +449,7 @@ class Inventory():
                 device=self.device_id,
                 manufacturer=manufacturer.id,
                 discovered=True,
-                tags=[INVENTORY_TAG['gpu']['name']],
+                tags=[{'name': INVENTORY_TAG['gpu']['name']}],
                 name=gpu['product'],
                 description='GPU {}'.format(gpu['product']),
             )
