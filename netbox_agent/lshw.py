@@ -77,6 +77,8 @@ class LSHW():
     def find_storage(self, obj):
         if "children" in obj:
             for device in obj["children"]:
+                if device.get("id") == 'cdrom':
+                    continue
                 d = {}
                 d["logicalname"] = device.get("logicalname")
                 d["product"] = device.get("product")
